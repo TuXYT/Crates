@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_crates" default="compile.module.crates">
+  <dirname property="module.crates.basedir" file="${ant.file.module_crates}"/>
+  
+  <property name="module.jdk.home.crates" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.crates" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.crates" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.crates" value="-encoding UTF-8 -source 1.5 -target 1.5 ${compiler.args}"/>
+  
+  <property name="crates.output.dir" value="${module.crates.basedir}/out/production/Crates"/>
+  <property name="crates.testoutput.dir" value="${module.crates.basedir}/out/test/Crates"/>
+  
+  <path id="crates.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="crates.module.production.classpath">
+    <path refid="${module.jdk.classpath.crates}"/>
+    <path refid="library.spigot-latest.classpath"/>
+  </path>
+  
+  <path id="crates.runtime.production.module.classpath">
+    <pathelement location="${crates.output.dir}"/>
+    <path refid="library.spigot-latest.classpath"/>
+  </path>
+  
+  <path id="crates.module.classpath">
+    <path refid="${module.jdk.classpath.crates}"/>
+    <pathelement location="${crates.output.dir}"/>
+    <path refid="library.spigot-latest.classpath"/>
+  </path>
+  
+  <path id="crates.runtime.module.classpath">
+    <pathelement location="${crates.testoutput.dir}"/>
+    <pathelement location="${crates.output.dir}"/>
+    <path refid="library.spigot-latest.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.crates">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.crates">
+    <patternset refid="excluded.from.module.crates"/>
+  </patternset>
+  
+  <path id="crates.module.sourcepath">
+    <dirset dir="${module.crates.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.crates" depends="compile.module.crates.production,compile.module.crates.tests" description="Compile module Crates"/>
+  
+  <target name="compile.module.crates.production" depends="register.custom.compilers" description="Compile module Crates; production classes">
+    <mkdir dir="${crates.output.dir}"/>
+    <javac2 destdir="${crates.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.crates}/javac">
+      <compilerarg line="${compiler.args.crates}"/>
+      <bootclasspath refid="crates.module.bootclasspath"/>
+      <classpath refid="crates.module.production.classpath"/>
+      <src refid="crates.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.crates"/>
+    </javac2>
+    
+    <copy todir="${crates.output.dir}">
+      <fileset dir="${module.crates.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.crates.tests" depends="register.custom.compilers,compile.module.crates.production" description="compile module Crates; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.crates" description="cleanup module">
+    <delete dir="${crates.output.dir}"/>
+    <delete dir="${crates.testoutput.dir}"/>
+  </target>
+</project>

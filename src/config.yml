@@ -1,0 +1,8 @@
+# For percentages for the chances
+# MAKE SURE THERES A SPACE BETWEEN THE COLON AND THE NUMBER
+Stone: 100
+CoalOre: 50
+IronOre: 25
+GoldOre: 10
+DiamondOre: 5
+EmeraldOre: 5
